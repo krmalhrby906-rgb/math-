@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Math Fun Game</title>
+<style>
+    body {
+        font-family: 'Arial', sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        transition: background 0.5s;
+        color: #333;
+    }
+    .container {
+        background: white;
+        padding: 30px 40px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        text-align: center;
+        width: 360px;
+        transition: transform 0.3s;
+    }
+    .container:hover {
+        transform: scale(1.05);
+    }
+    h1 {
+        margin-bottom: 20px;
+    }
+    .question {
+        font-size: 28px;
+        margin-bottom: 20px;
+    }
+    input[type="number"] {
+        padding: 10px;
+        font-size: 18px;
+        width: 100px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+    button {
+        padding: 10px 20px;
+        font-size: 18px;
+        border: none;
+        border-radius: 10px;
+        background-color: #74ebd5;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+    button:hover {
+        background-color: #ACB6E5;
+        color: white;
+    }
+    .score, .timer {
+        margin-top: 15px;
+        font-size: 20px;
+    }
+    .feedback {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>Math Fun Game</h1>
+    <div class="question" id="question">Loading...</div>
+    <input type="number" id="answer" placeholder="Your answer">
+    <br>
+    <button onclick="checkAnswer()">Submit</button>
+    <div class="feedback" id="feedback"></div>
+    <div class="score">Score: <span id="score">0</span></div>
+    <div class="timer">Time left: <span id="time">10</span>s</div>
+</div>
+
+<script>
+let score = 0;
+let num1, num2, operator, correctAnswer;
+let time = 10;
+let timer;
+
+const colors = ['#FF9A9E','#FAD0C4','#A18CD1','#FBC2EB','#74ebd5','#ACB6E5','#FDCB82','#FFB347'];
+
+function generateQuestion() {
+    // Change background color randomly
+    document.body.style.background = colors[Math.floor(Math.random() * colors.length)];
+
+    num1 = Math.floor(Math.random() * 20) + 1;
+    num2 = Math.floor(Math.random() * 20) + 1;
+    const operators = ['+', '-', '*'];
+    operator = operators[Math.floor(Math.random() * operators.length)];
+
+    if(operator === '+') correctAnswer = num1 + num2;
+    if(operator === '-') correctAnswer = num1 - num2;
+    if(operator === '*') correctAnswer = num1 * num2;
+
+    document.getElementById('question').innerText = `${num1} ${operator} ${num2} = ?`;
+    document.getElementById('answer').value = '';
+    document.getElementById('feedback').innerText = '';
+    time = 10;
+    document.getElementById('time').innerText = time;
+
+    if(timer) clearInterval(timer);
+    timer = setInterval(() => {
+        time--;
+        document.getElementById('time').innerText = time;
+        if(time <= 0) {
+            clearInterval(timer);
+            document.getElementById('feedback').innerText = `⏰ Time's up! Correct: ${correctAnswer}`;
+            generateQuestion();
+        }
+    }, 1000);
+}
+
+function checkAnswer() {
+    const userAnswer = parseInt(document.getElementById('answer').value);
+    const feedback = document.getElementById('feedback');
+
+    if(userAnswer === correctAnswer) {
+        feedback.innerText = '🎉 Correct!';
+        score += 1;
+        playSound('correct');
+    } else {
+        feedback.innerText = `❌ Wrong! Correct: ${correctAnswer}`;
+        if(score > 0) score -= 1;
+        playSound('wrong');
+    }
+    document.getElementById('score').innerText = score;
+    generateQuestion();
+}
+
+function playSound(type) {
+    let audio;
+    if(type === 'correct') {
+        audio = new Audio('https://freesound.org/data/previews/320/320654_5260870-lq.mp3');
+    } else {
+        audio = new Audio('https://freesound.org/data/previews/331/331912_3248244-lq.mp3');
+    }
+    audio.play();
+}
+
+// Start the first question
+generateQuestion();
+</script>
+</body>
+</html>
